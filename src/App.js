@@ -4,13 +4,33 @@ import Layout from "./components/Layout/Layout";
 import Products from "./components/Shop/Products";
 import { useSelector, useDispatch } from "react-redux";
 import { layoutActions } from "./store/layout-slice";
+import { cartActions } from "./store/cart-slice";
 import Notification from "./components/UI/Notification";
+
+let ifInitial = true;
 
 function App() {
   const dispatch = useDispatch();
   const isCartVisible = useSelector((state) => state.layout.isCartVisible);
   const showNotification = useSelector((state) => state.layout.notification);
   const cart = useSelector((state) => state.cart);
+
+  const fetchData = async () => {
+    const response = await fetch(
+      "https://react-ecom-bootstrap-default-rtdb.asia-southeast1.firebasedatabase.app/shopping.json"
+    );
+    if (!response.ok) {
+      throw new Error("cart data fething failed");
+    }
+    const json = await response.json();
+    console.log(json);
+    dispatch(cartActions.replaceCart(json));
+  };
+
+  if (ifInitial) {
+    fetchData();
+    ifInitial = false;
+  }
 
   useEffect(() => {
     dispatch(
